@@ -376,8 +376,10 @@ if ($Proceed -eq "Y")
         #Gets last write time of the Root Key
         $LastWriteTime = $RootKey | Add-RegKeyMember | Select Name, LastWriteTime
 
+        #Checks for number of values in root registry key
         if ($RootKey.Property.count -gt 1)
         {
+            #Goes through each value and creates PSObject with information regarding the value
             foreach ($Value in $RootKey.Property)
             {
                 $ObjInput = New-Object System.Object
@@ -399,6 +401,7 @@ if ($Proceed -eq "Y")
         }
         else
         {
+            #there is 1 or less values, display said value
             $ObjInput = New-Object System.Object
 	        $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Name" -Value $($RootKey.Name)
 	        
@@ -427,13 +430,16 @@ if ($Proceed -eq "Y")
             
 	        $CSVData += $ObjInput
         }
-
+        #Parses through sub keys of root key
         foreach ($Key in $SubKeys)
         {
+            #Gets Last write Time of Registry KEY (Not value)
             $LastWriteTime = $Key | Add-RegKeyMember | Select Name, LastWriteTime
 
+            #Checks for number of values in sub registry key
             if ($Key.Property.count -gt 1)
             {
+                #Goes through each value and creates PSObject with information regarding the value
                 foreach ($Value in $Key.Property)
                 {
                     $ObjInput = New-Object System.Object
@@ -456,9 +462,11 @@ if ($Proceed -eq "Y")
             }
             else
             {
-            
+                #there is 1 or less values, display said value
+
                 $ObjInput = New-Object System.Object
 			    $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Name" -Value $($Key.Name)
+
                 #Checks for Values existing in registry key
                 if ($Key.Property -ge 1)
                 {
@@ -486,9 +494,13 @@ if ($Proceed -eq "Y")
 
         Write-Host "Exporting to JSON`n`nView of Export:"
 
+        
         try
 	    {
+            #Displays Data that will be exported in PSObject Format
             $CSVData
+
+            #Checks for C:\temp existing and creates folder if it doesn't exist.
             if (!(test-path "C:\temp"))
             {
                 Write-Host "C:\temp does not exist, creating directory"
@@ -497,6 +509,7 @@ if ($Proceed -eq "Y")
 
             }
 		    
+            #Exports PSObject to JSON 
             $CSVData | ConvertTo-JSONTwo | Out-File "C:\temp\registry-Export.json"
 
             #$CSVData | Export-Csv -NoTypeInformation -Path "c:\temp\Regsitry-Export.csv" -Force
