@@ -27,7 +27,7 @@ function Escape-JSONString($str){
 }
 
 #Below JSON Conversion from (https://gist.github.com/mdnmdn/6936714)
-function ConvertTo-JSONTwo($maxDepth = 4,$forceArray = $false) {
+function ConvertTo-JSON-V2($maxDepth = 4,$forceArray = $false) {
 	begin {
 		$data = @()
 	}
@@ -66,7 +66,7 @@ function ConvertTo-JSONTwo($maxDepth = 4,$forceArray = $false) {
 					foreach($elem in $value){
 						#if ($elem -eq $null) {continue}
 						if ($jsonResult.Length -gt 0) {$jsonResult +=', '}				
-						$jsonResult += ($elem | ConvertTo-JSONTwo -maxDepth ($maxDepth -1))
+						$jsonResult += ($elem | ConvertTo-JSON-V2 -maxDepth ($maxDepth -1))
 					}
 					return "[" + $jsonResult + "]"
 	            }
@@ -77,7 +77,7 @@ function ConvertTo-JSONTwo($maxDepth = 4,$forceArray = $false) {
 						$jsonResult += 
 @"
 	"{0}": {1}
-"@ -f $key , ($value[$key] | ConvertTo-JSONTwo -maxDepth ($maxDepth -1) )
+"@ -f $key , ($value[$key] | ConvertTo-JSON-V2 -maxDepth ($maxDepth -1) )
 					}
 					return "{" + $jsonResult + "}"
 				}
@@ -88,7 +88,7 @@ function ConvertTo-JSONTwo($maxDepth = 4,$forceArray = $false) {
 						(($value | Get-Member -MemberType *property | % { 
 @"
 	"{0}": {1}
-"@ -f $_.Name , ($value.($_.Name) | ConvertTo-JSONTwo -maxDepth ($maxDepth -1) )			
+"@ -f $_.Name , ($value.($_.Name) | ConvertTo-JSON-V2 -maxDepth ($maxDepth -1) )			
 					
 					}) -join ', ') + "}"
 	    		}
@@ -338,6 +338,13 @@ if ($Proceed -eq "Y")
 {
     $Continue = 0
 
+    #Checking for HKU:\ and creating Drive
+    if ($RegistryKeyQuery -match "HKU:\.*")
+    {
+        Remove-PSDrive HKU -Force
+        New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
+    }
+
     #Checks for Registry Key matching proper format.
     if ($RegistryKeyQuery -notmatch ".*:\\.*")
     {
@@ -361,6 +368,8 @@ if ($Proceed -eq "Y")
 
     if ($Continue -eq 1)
     {
+        
+
         Write-Host "Begin recursive search for $RegistryKeyQuery" -ForegroundColor Green
 
         #Sets Headers for CSV (if CSV is your export option)
@@ -510,14 +519,14 @@ if ($Proceed -eq "Y")
             }
 		    
             #Exports PSObject to JSON 
-            $CSVData | ConvertTo-JSONTwo | Out-File "C:\temp\registry-Export.json"
+            $CSVData | ConvertTo-JSON-V2 | Out-File "C:\temp\registry-Export.json"
 
             #$CSVData | Export-Csv -NoTypeInformation -Path "c:\temp\Regsitry-Export.csv" -Force
 		    Write-Host "Data Successfully Exported!`n`nFile is located in C:\temp\Registry-Export.json" -ForegroundColor Green
 	    }
 	    catch [exception]
 	    {
-		    Write-Error -Message "Failed to Export Data to a CSV`n`nERROR: $_"
+		    Write-Error -Message "Failed to Export Data`n`nERROR: $_"
 	    }
 
     }
