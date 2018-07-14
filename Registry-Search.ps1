@@ -341,7 +341,7 @@ if ($Proceed -eq "Y")
     #Checking for HKU:\ and creating Drive
     if ($RegistryKeyQuery -match "HKU:\.*")
     {
-        Remove-PSDrive HKU -Force
+        Remove-PSDrive HKU -Force -ErrorAction SilentlyContinue
         New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
     }
 
@@ -406,6 +406,7 @@ if ($Proceed -eq "Y")
 			    $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Last Write Time" -Value $($LastWriteTime.LastWriteTime)
                 $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Value Type" -Value ($RootKey.GetValueKind($Value)).ToString() -ErrorAction SilentlyContinue
 			    $CSVData += $ObjInput
+                $ObjInput
             }
         }
         else
@@ -438,6 +439,7 @@ if ($Proceed -eq "Y")
 	        $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Last Write Time" -Value $($LastWriteTime.LastWriteTime)
             
 	        $CSVData += $ObjInput
+            $ObjInput
         }
         #Parses through sub keys of root key
         foreach ($Key in $SubKeys)
@@ -467,6 +469,7 @@ if ($Proceed -eq "Y")
                     $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Value Type" -Value ($(try{($Key.GetValueKind($Value)).ToString()} catch [exception]{"Default value - String"}))
             
 			        $CSVData += $ObjInput
+                    $ObjInput
                 }
             }
             else
@@ -498,6 +501,7 @@ if ($Proceed -eq "Y")
 			    $ObjInput | Add-Member -MemberType NoteProperty -Name "Key Last Write Time" -Value $($LastWriteTime.LastWriteTime)
                 
 			    $CSVData += $ObjInput
+                $ObjInput
             }
         }
 
@@ -507,7 +511,7 @@ if ($Proceed -eq "Y")
         try
 	    {
             #Displays Data that will be exported in PSObject Format
-            $CSVData
+            #$CSVData
 
             #Checks for C:\temp existing and creates folder if it doesn't exist.
             if (!(test-path "C:\temp"))
