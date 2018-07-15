@@ -559,34 +559,41 @@ if ($Proceed -eq "Y")
 			}
 		}
 		
-		Write-Host "Exporting to JSON`n`nView of Export:"
-		
-		
-		try
+		if (($CSVData | Out-String) -eq "")
 		{
-			#Displays Data that will be exported in PSObject Format
-			#$CSVData
+			Write-Warning "Nothing found in registry that matches $MatchPattern"
+		}
+		else
+		{
 			
-			#Checks for C:\temp existing and creates folder if it doesn't exist.
-			if (!(test-path "C:\temp"))
+			Write-Host "Exporting to JSON`n`nView of Export:"
+			
+			
+			try
 			{
-				Write-Host "C:\temp does not exist, creating directory"
+				#Displays Data that will be exported in PSObject Format
+				#$CSVData
 				
-				New-Item -Name temp -Path C:\ -ItemType Directory -Force
+				#Checks for C:\temp existing and creates folder if it doesn't exist.
+				if (!(test-path "C:\temp"))
+				{
+					Write-Host "C:\temp does not exist, creating directory"
+					
+					New-Item -Name temp -Path C:\ -ItemType Directory -Force
+					
+				}
 				
+				#Exports PSObject to JSON 
+				$CSVData | ConvertTo-JSON-V2 | Out-File "C:\temp\registry-Export.json"
+				
+				#$CSVData | Export-Csv -NoTypeInformation -Path "c:\temp\Regsitry-Export.csv" -Force
+				Write-Host "Data Successfully Exported!`n`nFile is located in C:\temp\Registry-Export.json" -ForegroundColor Green
 			}
-			
-			#Exports PSObject to JSON 
-			$CSVData | ConvertTo-JSON-V2 | Out-File "C:\temp\registry-Export.json"
-			
-			#$CSVData | Export-Csv -NoTypeInformation -Path "c:\temp\Regsitry-Export.csv" -Force
-			Write-Host "Data Successfully Exported!`n`nFile is located in C:\temp\Registry-Export.json" -ForegroundColor Green
+			catch [exception]
+			{
+				Write-Error -Message "Failed to Export Data`n`nERROR: $_"
+			}
 		}
-		catch [exception]
-		{
-			Write-Error -Message "Failed to Export Data`n`nERROR: $_"
-		}
-		
 	}
 	else
 	{
