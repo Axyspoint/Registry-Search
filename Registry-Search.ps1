@@ -9,6 +9,7 @@
     
     Usage:
         Parameter must be in the format of (HKLM:\ or HKCU:\)
+		You can choose to match regex patterns and return only registry keys/value/data that match a specific regex pattern. Default will get everything.
 #>
 
 param (
@@ -17,13 +18,11 @@ param (
 	$MatchPattern
 )
 
+#Checks Match Pattern to have data, if it doesn't, everything under the specified key will be returned.'
 if (($MatchPattern -eq $null) -or ($MatchPattern -eq ""))
 {
 	$MatchPattern = ".*"
 }
-
-#Below is for testing ONLY
-#$RegistryKeyQuery = "HKLM:\SOFTWARE"
 
 #Below JSON Conversion from (https://gist.github.com/mdnmdn/6936714)
 function Escape-JSONString($str)
