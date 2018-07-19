@@ -421,7 +421,7 @@ if ($Proceed -eq "Y")
 		$SubKeys = Get-ChildItem "$RegistryKeyQuery" -Recurse
 		
 		#Gets last write time of the Root Key
-		$LastWriteTime = $RootKey | Add-RegKeyMember | Select Name, LastWriteTime
+		
 		
 		#Checks for number of values in root registry key
 		if ($RootKey.Property.count -gt 1)
@@ -431,6 +431,7 @@ if ($Proceed -eq "Y")
 			{
 				if (($RootKey.Name -match $MatchPattern) -or ($Value -match $MatchPattern) -or (($($RootKey.GetValue($Value)) -join "|") -match $MatchPattern))
 				{
+					$LastWriteTime = $RootKey | Add-RegKeyMember | Select Name, LastWriteTime
 					$ObjInput = New-Object System.Object
 					$ObjInput | Add-Member -MemberType NoteProperty -Name "Key Name" -Value $($RootKey.Name)
 					$ObjInput | Add-Member -MemberType NoteProperty -Name "Key Value" -Value $($Value)
@@ -454,6 +455,7 @@ if ($Proceed -eq "Y")
 		{
 			if (($RootKey.Name -match $MatchPattern) -or ($RootKey.Property -match $MatchPattern) -or (($($RootKey.GetValue($RootKey.Property)) -join "|") -match $MatchPattern))
 			{
+				$LastWriteTime = $RootKey | Add-RegKeyMember | Select Name, LastWriteTime
 				#there is 1 or less values, display said value
 				$ObjInput = New-Object System.Object
 				$ObjInput | Add-Member -MemberType NoteProperty -Name "Key Name" -Value $($RootKey.Name)
@@ -491,7 +493,7 @@ if ($Proceed -eq "Y")
 		{
 			
 			#Gets Last write Time of Registry KEY (Not value)
-			$LastWriteTime = $Key | Add-RegKeyMember | Select Name, LastWriteTime
+			
 			
 			#Checks for number of values in sub registry key
 			if ($Key.Property.count -gt 1)
@@ -502,6 +504,7 @@ if ($Proceed -eq "Y")
 				{
 					if (($Key.Name -match $MatchPattern) -or ($Value -match $MatchPattern) -or (($($Key.GetValue($Value)) -join "|") -match $MatchPattern))
 					{
+						$LastWriteTime = $Key | Add-RegKeyMember | Select Name, LastWriteTime
 						$ObjInput = New-Object System.Object
 						$ObjInput | Add-Member -MemberType NoteProperty -Name "Key Name" -Value $($Key.Name)
 						$ObjInput | Add-Member -MemberType NoteProperty -Name "Key Value" -Value $($Value)
@@ -527,6 +530,7 @@ if ($Proceed -eq "Y")
 			{
 				if (($Key.Name -match $MatchPattern) -or ($Key.Property -match $MatchPattern) -or (($($Key.GetValue($Key.Property)) -join "|") -match $MatchPattern))
 				{
+					$LastWriteTime = $Key | Add-RegKeyMember | Select Name, LastWriteTime
 					#there is 1 or less values, display said value
 					
 					$ObjInput = New-Object System.Object
